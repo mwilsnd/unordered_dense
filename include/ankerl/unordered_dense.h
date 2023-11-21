@@ -70,6 +70,21 @@
 #    define ANKERL_UNORDERED_DENSE_NOINLINE __attribute__((noinline))
 #endif
 
+// RTTI
+#if defined(_MSC_VER)
+#    if defined(_CPPRTTI)
+#        define ANKERL_UNORDERED_DENSE_HAS_RTTI
+#    endif
+#elif defined(__clang__)
+#    if __has_feature(cxx_rtti)
+#        define ANKERL_UNORDERED_DENSE_HAS_RTTI
+#    endif
+#elif defined(__GNUC__)
+#    if defined(__GXX_RTTI)
+#        define ANKERL_UNORDERED_DENSE_HAS_RTTI
+#    endif
+#endif
+
 // defined in unordered_dense.cpp
 #if !defined(ANKERL_UNORDERED_DENSE_EXPORT)
 #    define ANKERL_UNORDERED_DENSE_EXPORT
@@ -98,10 +113,10 @@
 #    endif
 
 #    if defined(__has_include)
-#        if __has_include(<memory_resource>)
+#        if __has_include(<memory_resource>) && defined(ANKERL_UNORDERED_DENSE_HAS_RTTI)
 #            define ANKERL_UNORDERED_DENSE_PMR std::pmr // NOLINT(cppcoreguidelines-macro-usage)
 #            include <memory_resource>                  // for polymorphic_allocator
-#        elif __has_include(<experimental/memory_resource>)
+#        elif __has_include(<experimental/memory_resource>) && defined(ANKERL_UNORDERED_DENSE_HAS_RTTI)
 #            define ANKERL_UNORDERED_DENSE_PMR std::experimental::pmr // NOLINT(cppcoreguidelines-macro-usage)
 #            include <experimental/memory_resource>                   // for polymorphic_allocator
 #        endif
